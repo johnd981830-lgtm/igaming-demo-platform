@@ -1,12 +1,14 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { apiFetch } from '../../lib/api';
+import { getStoredUser, saveStoredUser } from '../../lib/storage';
 
 type Game = {
   id: string;
   title: string;
   category: string;
-  volatility: string;
+  volatility: 'Low' | 'Medium' | 'High';
   rtp: number;
   provider: string;
   image: string;
@@ -15,80 +17,103 @@ type Game = {
 export default function CasinoPage() {
   const [games, setGames] = useState<Game[]>([]);
   const [userId, setUserId] = useState('user-1');
-  const [balance, setBalance] = useState<number>(2500);
+  const [balance, setBalance] = useState(2500);
   const [wagers, setWagers] = useState<Record<string, number>>({});
+  const [loading, setLoading] = useState(true);
+  const [notice, setNotice] = useState('');
+  const [activeTab, setActiveTab] = useState<'All' | 'Slots' | 'Table' | 'Instant'>('All');
 
   useEffect(() => {
-    fetch('http://localhost:3001/api/casino/games')
-      .then((res) => res.json())
-      .then(setGames)
-      .catch(console.error);
+    const user = getStoredUser();
+    setUserId(user.id || 'user-1');
+    setBalance(user.balance || 2500);
 
-    const raw = localStorage.getItem('primebet-user');
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      setUserId(parsed.id || 'user-1');
-      setBalance(parsed.balance || 2500);
-    }
+    apiFetch<Game[]>('/casino/games')
+      .then(setGames)
+      .catch(() => setNotice('Unable to load the casino lobby. Start the backend and try again.'))
+      .finally(() => setLoading(false));
   }, []);
+
+  const filteredGames = useMemo(() => {
+    return activeTab === 'All' ? games : games.filter((game) => game.category === activeTab);
+  }, [games, activeTab]);
 
   const playGame = async (gameId: string) => {
     const wager = wagers[gameId] || 50;
-    const res = await fetch('http://localhost:3001/api/casino/play', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId, gameId, wager }),
-    });
-    const data = await res.json();
+    if (!Number.isFinite(wager) || wager <= 0) {
+      setNotice('Choose a valid wager amount.');
+      return;
+    }
 
-    if (data.ok) {
-      setBalance(data.balance);
-      const saved = JSON.parse(localStorage.getItem('primebet-user') || '{}');
-      if (saved.id) {
-        saved.balance = data.balance;
-        localStorage.setItem('primebet-user', JSON.stringify(saved));
+    try {
+      const data = await apiFetch<any>('/casino/play', {
+        method: 'POST',
+        body: JSON.stringify({ userId, gameId, wager }),
+      });
+
+      if (!data.ok) {
+        setNotice(data.message || 'Game could not be played.');
+        return;
       }
-      alert(`${data.result.toUpperCase()} — payout: $${data.payout}`);
-    } else {
-      alert(data.message);
+
+      setBalance(data.balance);
+      saveStoredUser({ ...getStoredUser(), id: userId, balance: data.balance });
+      setNotice(`${data.result.toUpperCase()} · payout $${data.payout} · balance $${data.balance}`);
+    } catch {
+      setNotice('Unable to play the game. Check the backend connection.');
     }
   };
 
   return (
-    <main className="page-shell">
-      <div className="page-header-row">
-        <h1>Casino Lobby</h1>
-        <div className="pill-green">Balance: ${balance}</div>
-      </div>
+    <main className="page-shell casino-shell">
+      <section className="casino-hero">
+        <div>
+          <div className="eyebrow">PrimeBet Casino</div>
+          <h1>Instant thrills, premium tables.</h1>
+          <p className="subtitle">A polished casino lobby with curated categories, transparent RTP, and frictionless demo gameplay.</p>
+        </div>
+        <div className="casino-balance-card">
+          <span>Wallet</span>
+          <strong>${balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}</strong>
+          <small>Available balance</small>
+        </div>
+      </section>
 
-      <div className="game-grid">
-        {games.map((game) => (
-          <div key={game.id} className="card-panel game-card">
-            <div className="game-icon">{game.image}</div>
-            <div className="game-header">
-              <h3>{game.title}</h3>
-              <span>{game.category}</span>
-            </div>
-            <div className="game-meta">Provider: {game.provider}</div>
-            <div className="game-meta">Volatility: {game.volatility}</div>
-            <div className="game-meta green">RTP: {game.rtp}%</div>
+      <section className="casino-toolbar card-panel">
+        <div className="casino-tabs">
+          {(['All', 'Slots', 'Table', 'Instant'] as const).map((tab) => (
+            <button key={tab} className={activeTab === tab ? 'casino-tab selected' : 'casino-tab'} onClick={() => setActiveTab(tab)}>{tab}</button>
+          ))}
+        </div>
+      </section>
 
-            <div className="input-row">
-              <input
-                type="number"
-                min={10}
-                step={10}
-                value={wagers[game.id] || 50}
-                onChange={(e) => setWagers((prev) => ({ ...prev, [game.id]: Number(e.target.value) }))}
-              />
-            </div>
+      {notice && <div className="notice-bar">{notice}</div>}
 
-            <button className="primary-btn full" onClick={() => playGame(game.id)}>
-              Play for ${wagers[game.id] || 50}
-            </button>
-          </div>
-        ))}
-      </div>
+      {loading ? <div className="card-panel empty-state">Loading casino games...</div> : (
+        <section className="game-grid">
+          {filteredGames.map((game) => (
+            <article key={game.id} className="game-card card-panel">
+              <div className="game-card-header">
+                <div className="game-icon">{game.image}</div>
+                <span className="game-badge">{game.category}</span>
+              </div>
+
+              <div className="game-card-body">
+                <h3>{game.title}</h3>
+                <div className="game-meta-row"><span>Provider</span><strong>{game.provider}</strong></div>
+                <div className="game-meta-row"><span>Volatility</span><strong>{game.volatility}</strong></div>
+                <div className="game-meta-row green-row"><span>RTP</span><strong>{game.rtp}%</strong></div>
+              </div>
+
+              <div className="game-controls">
+                <label>Wager</label>
+                <input type="number" min={10} step={10} value={wagers[game.id] || 50} onChange={(e) => setWagers((prev) => ({ ...prev, [game.id]: Number(e.target.value) }))} />
+                <button className="primary-btn full" onClick={() => playGame(game.id)}>Play for ${wagers[game.id] || 50}</button>
+              </div>
+            </article>
+          ))}
+        </section>
+      )}
     </main>
   );
 }

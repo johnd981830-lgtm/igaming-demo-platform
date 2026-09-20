@@ -1,65 +1,24 @@
-
-/* Premium sportsbook */
-.sports-hero { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; padding: 28px 0 30px; }
-.sports-hero h1 { margin-bottom: 12px; }
-.sports-balance-card { min-width: 220px; padding: 18px 20px; background: linear-gradient(145deg, rgba(31, 55, 83, .9), rgba(15, 23, 42, .92)); border: 1px solid rgba(125, 211, 252, .22); border-radius: 18px; }
-.sports-balance-card span, .sports-balance-card small { display: block; color: var(--muted); font-size: .78rem; }
-.sports-balance-card strong { display: block; margin: 7px 0; color: #86efac; font-size: 1.55rem; }
-.sports-toolbar { display: flex; align-items: center; gap: 18px; padding: 14px; margin-bottom: 22px; border-radius: 18px; }
-.search-wrap { display: flex; align-items: center; gap: 10px; flex: 1; padding: 0 12px; color: var(--muted); }
-.search-wrap input { border: 0; background: transparent; padding-left: 0; }
-.search-wrap input:focus { outline: none; }
-.league-tabs { display: flex; gap: 6px; flex-wrap: wrap; }
-.league-tab { border: 1px solid transparent; background: transparent; color: var(--muted); padding: 9px 12px; border-radius: 10px; cursor: pointer; white-space: nowrap; }
-.league-tab:hover, .league-tab.selected { color: var(--text); background: rgba(59, 130, 246, .15); border-color: rgba(59, 130, 246, .25); }
-.sports-layout { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 22px; align-items: start; }
-.section-heading { display: flex; justify-content: space-between; align-items: center; margin: 5px 0 14px; font-size: 1.05rem; font-weight: 700; }
-.section-heading > div { display: flex; align-items: center; gap: 9px; }
-.live-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 5px var(--green-soft); }
-.market-list { display: grid; gap: 13px; }
-.market-card { padding: 19px; background: rgba(15, 23, 42, .84); border: 1px solid var(--card-border); border-radius: 18px; transition: border-color .15s ease, transform .15s ease; }
-.market-card:hover { border-color: rgba(125, 211, 252, .35); transform: translateY(-1px); }
-.market-card-top, .market-card-footer { display: flex; justify-content: space-between; gap: 18px; }
-.market-card-top { align-items: flex-start; }
-.league-label { color: #7dd3fc; font-size: .74rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; }
-.market-card h3 { margin-top: 8px; font-size: 1.05rem; }
-.versus { color: var(--muted); font-weight: 400; margin: 0 5px; }
-.event-time { color: var(--muted); text-align: right; font-size: .76rem; }
-.event-time span { display: block; margin-bottom: 4px; }
-.event-time b { display: block; color: var(--text); margin-top: 3px; }
-.market-card-footer { align-items: center; margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(148, 163, 184, .1); }
-.market-title { color: var(--muted); font-size: .8rem; white-space: nowrap; }
-.market-buttons { display: grid; grid-template-columns: repeat(3, minmax(100px, 1fr)); gap: 8px; flex: 1; }
-.market-odd { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 10px 11px; border: 1px solid var(--card-border); border-radius: 10px; background: #0b1220; color: var(--muted); cursor: pointer; font-size: .76rem; }
-.market-odd b { color: #fbbf24; font-size: .86rem; }
-.market-odd:hover, .market-odd.active { border-color: var(--green); background: var(--green-soft); color: var(--text); }
-.bet-slip { position: sticky; top: 92px; padding: 19px; border-radius: 20px; }
-.slip-heading { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 16px; border-bottom: 1px solid var(--card-border); }
-.slip-heading > div { display: flex; gap: 10px; align-items: center; }
-.slip-heading h2 { margin: 0; font-size: 1.08rem; }
-.slip-heading small { color: var(--muted); }
-.slip-icon { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 9px; background: var(--green-soft); color: #86efac; font-weight: 800; }
-.clear-btn { border: 0; background: transparent; color: var(--muted); cursor: pointer; font-size: .75rem; }
-.clear-btn:hover { color: #fca5a5; }
-.slip-empty { display: grid; place-items: center; text-align: center; padding: 42px 12px; color: var(--muted); }
-.slip-empty strong { color: var(--text); margin: 12px 0 6px; font-size: .9rem; }
-.slip-empty span { font-size: .75rem; line-height: 1.45; }
-.slip-empty-icon { display: grid; place-items: center; width: 46px; height: 46px; border: 1px dashed rgba(148, 163, 184, .4); border-radius: 50%; font-size: 1.5rem; }
-.slip-selections { display: grid; gap: 10px; padding: 15px 0; }
-.slip-selection { position: relative; padding: 12px 30px 12px 12px; border-radius: 11px; background: #0b1220; border: 1px solid var(--card-border); }
-.slip-selection > button { position: absolute; top: 8px; right: 9px; border: 0; background: transparent; color: var(--muted); cursor: pointer; }
-.slip-selection span, .slip-selection small { display: block; font-size: .76rem; }
-.slip-selection small { margin-top: 7px; color: #7dd3fc; }
-.slip-selection b { float: right; color: #fbbf24; }
-.slip-summary { display: grid; gap: 13px; padding: 15px 0; border-top: 1px solid var(--card-border); border-bottom: 1px solid var(--card-border); }
-.slip-summary > div, .slip-summary label { display: flex; justify-content: space-between; align-items: center; color: var(--muted); font-size: .8rem; }
-.slip-summary b { color: #fbbf24; }
-.slip-summary strong { color: #86efac; font-size: 1.05rem; }
-.slip-summary input { width: 110px; padding: 8px 10px; text-align: right; }
-.place-btn { margin-top: 16px; }
-.place-btn:disabled { opacity: .45; cursor: not-allowed; transform: none; }
-.responsible-note { display: block; color: var(--muted); text-align: center; font-size: .68rem; line-height: 1.4; margin-top: 12px; }
-.notice-bar { margin-bottom: 14px; padding: 11px 13px; border: 1px solid rgba(251, 191, 36, .28); border-radius: 11px; color: #fde68a; background: rgba(120, 73, 10, .2); font-size: .82rem; }
-.empty-state { padding: 40px; color: var(--muted); text-align: center; }
-@media (max-width: 900px) { .sports-layout { grid-template-columns: 1fr; } .bet-slip { position: static; } }
-@media (max-width: 680px) { .sports-hero, .sports-toolbar, .market-card-top, .market-card-footer { flex-direction: column; align-items: stretch; } .sports-balance-card { width: 100%; } .event-time { text-align: left; } .market-buttons { grid-template-columns: 1fr; } }
+/* Casino premium */
+.casino-shell { padding-top: 20px; }
+.casino-hero { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; padding: 18px 0 26px; }
+.casino-hero h1 { margin-bottom: 12px; }
+.casino-balance-card { min-width: 220px; padding: 18px 20px; background: linear-gradient(145deg, rgba(28, 54, 84, .9), rgba(15, 23, 42, .92)); border: 1px solid rgba(96, 165, 250, .2); border-radius: 18px; }
+.casino-balance-card span, .casino-balance-card small { display: block; color: var(--muted); font-size: .8rem; }
+.casino-balance-card strong { display: block; margin: 8px 0; font-size: 1.6rem; color: #86efac; }
+.casino-toolbar { padding: 14px; margin-bottom: 18px; }
+.casino-tabs { display: flex; gap: 8px; flex-wrap: wrap; }
+.casino-tab { background: transparent; border: 1px solid transparent; color: var(--muted); cursor: pointer; border-radius: 10px; padding: 9px 12px; }
+.casino-tab.selected { background: rgba(59, 130, 246, .1); border-color: rgba(59, 130, 246, .18); color: var(--text); }
+.game-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(245px, 1fr)); gap: 18px; }
+.game-card { display: flex; flex-direction: column; gap: 18px; min-height: 360px; }
+.game-card-header { display: flex; justify-content: space-between; align-items: center; }
+.game-icon { display: grid; place-items: center; width: 60px; height: 60px; font-size: 2.6rem; background: rgba(10, 17, 28, .8); border-radius: 18px; border: 1px solid var(--card-border); }
+.game-badge { display: inline-flex; align-items: center; padding: 7px 10px; border-radius: 999px; background: rgba(139, 92, 246, .12); border: 1px solid rgba(139, 92, 246, .2); color: #d8b4fe; font-size: .72rem; font-weight: 700; }
+.game-card-body h3 { margin: 0 0 12px; font-size: 1.45rem; }
+.game-meta-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid rgba(148, 163, 184, .08); color: var(--muted); }
+.game-meta-row strong { color: var(--text); }
+.green-row strong { color: #86efac; }
+.game-controls { margin-top: auto; display: grid; gap: 10px; }
+.game-controls label { color: var(--muted); font-size: .78rem; }
+.game-controls input { width: 100%; }
+@media (max-width: 700px) { .casino-hero { flex-direction: column; align-items: stretch; } .casino-balance-card { width: 100%; } }
