@@ -27,4 +27,21 @@ export class AdminService {
       })),
     };
   }
+
+  getSummary() {
+    return {
+      overview: {
+        activePlayers: users.filter((u) => u.role === 'user').length,
+        pendingSettlements: bets.filter((bet) => bet.status === 'open').length,
+        transactions: ledger.length,
+        totalRevenue: ledger.reduce((sum, entry) => sum + (entry.type === 'bet' || entry.type === 'deposit' ? entry.amount : 0), 0),
+      },
+      topMarkets: [
+        { label: 'Premier League', volume: 12400 },
+        { label: 'La Liga', volume: 9380 },
+        { label: 'Champions League', volume: 11850 },
+      ],
+      recentWinners: [{ user: 'demo_player', amount: 480 }, { user: 'admin_master', amount: 280 }],
+    };
+  }
 }

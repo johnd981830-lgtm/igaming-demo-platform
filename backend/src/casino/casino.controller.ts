@@ -10,6 +10,11 @@ export class CasinoController {
     return this.casinoService.getGames();
   }
 
+  @Get('results')
+  getRecentResults(@Query('userId') userId: string) {
+    return this.casinoService.getRecentResults(userId);
+  }
+
   @Post('play')
   playGame(@Body() body: { userId: string; gameId: string; wager: number }) {
     return this.casinoService.playGame(body.userId, body.gameId, Number(body.wager));

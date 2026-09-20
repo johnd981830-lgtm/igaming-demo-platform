@@ -143,7 +143,28 @@ export const games: Game[] = [
   },
 ];
 
-export const bets: Bet[] = [];
+export const bets: Bet[] = [
+  {
+    id: 'bet-100',
+    userId: 'user-1',
+    matchId: 'match-1',
+    selection: 'Home Win',
+    stake: 50,
+    odds: 1.9,
+    status: 'open',
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: 'bet-101',
+    userId: 'user-1',
+    matchId: 'match-2',
+    selection: 'Away Win',
+    stake: 35,
+    odds: 2.8,
+    status: 'won',
+    createdAt: new Date(Date.now() - 600000).toISOString(),
+  },
+];
 
 export const ledger: LedgerEntry[] = [
   {
@@ -154,5 +175,23 @@ export const ledger: LedgerEntry[] = [
     currency: 'USD',
     createdAt: new Date().toISOString(),
     description: 'Initial deposit',
+  },
+  {
+    id: 'ledger-2',
+    userId: 'user-1',
+    type: 'bet',
+    amount: 50,
+    currency: 'USD',
+    createdAt: new Date(Date.now() - 300000).toISOString(),
+    description: 'Bet on Manchester City vs Arsenal',
+  },
+  {
+    id: 'ledger-3',
+    userId: 'user-1',
+    type: 'win',
+    amount: 98,
+    currency: 'USD',
+    createdAt: new Date(Date.now() - 600000).toISOString(),
+    description: 'Winning settlement',
   },
 ];

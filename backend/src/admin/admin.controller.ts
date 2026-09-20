@@ -9,4 +9,9 @@ export class AdminController {
   getStats() {
     return this.adminService.getStats();
   }
+
+  @Get('summary')
+  getSummary() {
+    return this.adminService.getSummary();
+  }
 }
