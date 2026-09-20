@@ -15,40 +15,76 @@ type Game = {
 export default function CasinoPage() {
   const [games, setGames] = useState<Game[]>([]);
   const [userId, setUserId] = useState('user-1');
+  const [balance, setBalance] = useState<number>(2500);
+  const [wagers, setWagers] = useState<Record<string, number>>({});
 
   useEffect(() => {
     fetch('http://localhost:3001/api/casino/games')
       .then((res) => res.json())
       .then(setGames)
       .catch(console.error);
+
+    const raw = localStorage.getItem('primebet-user');
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      setUserId(parsed.id || 'user-1');
+      setBalance(parsed.balance || 2500);
+    }
   }, []);
 
   const playGame = async (gameId: string) => {
+    const wager = wagers[gameId] || 50;
     const res = await fetch('http://localhost:3001/api/casino/play', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId, gameId, wager: 50 }),
+      body: JSON.stringify({ userId, gameId, wager }),
     });
     const data = await res.json();
-    alert(`${data.result.toUpperCase()} — payout: $${data.payout}`);
+
+    if (data.ok) {
+      setBalance(data.balance);
+      const saved = JSON.parse(localStorage.getItem('primebet-user') || '{}');
+      if (saved.id) {
+        saved.balance = data.balance;
+        localStorage.setItem('primebet-user', JSON.stringify(saved));
+      }
+      alert(`${data.result.toUpperCase()} — payout: $${data.payout}`);
+    } else {
+      alert(data.message);
+    }
   };
 
   return (
-    <main style={{ padding: 32, background: '#0b1020', color: '#f8fafc', minHeight: '100vh' }}>
-      <h1 style={{ fontSize: 42, marginBottom: 20 }}>Casino Lobby</h1>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 24 }}>
+    <main className="page-shell">
+      <div className="page-header-row">
+        <h1>Casino Lobby</h1>
+        <div className="pill-green">Balance: ${balance}</div>
+      </div>
+
+      <div className="game-grid">
         {games.map((game) => (
-          <div key={game.id} style={{ background: '#111827', borderRadius: 18, padding: 20 }}>
-            <div style={{ fontSize: 52 }}>{game.image}</div>
-            <h3 style={{ margin: '10px 0' }}>{game.title}</h3>
-            <div style={{ color: '#cbd5e1', marginBottom: 8 }}>{game.category}</div>
-            <div style={{ color: '#cbd5e1', marginBottom: 8 }}>Volatility: {game.volatility}</div>
-            <div style={{ color: '#86efac', marginBottom: 18 }}>RTP: {game.rtp}%</div>
-            <button
-              onClick={() => playGame(game.id)}
-              style={{ background: '#8b5cf6', color: '#fff', border: 'none', borderRadius: 12, padding: '10px 18px', cursor: 'pointer' }}
-            >
-              Play for $50
+          <div key={game.id} className="card-panel game-card">
+            <div className="game-icon">{game.image}</div>
+            <div className="game-header">
+              <h3>{game.title}</h3>
+              <span>{game.category}</span>
+            </div>
+            <div className="game-meta">Provider: {game.provider}</div>
+            <div className="game-meta">Volatility: {game.volatility}</div>
+            <div className="game-meta green">RTP: {game.rtp}%</div>
+
+            <div className="input-row">
+              <input
+                type="number"
+                min={10}
+                step={10}
+                value={wagers[game.id] || 50}
+                onChange={(e) => setWagers((prev) => ({ ...prev, [game.id]: Number(e.target.value) }))}
+              />
+            </div>
+
+            <button className="primary-btn full" onClick={() => playGame(game.id)}>
+              Play for ${wagers[game.id] || 50}
             </button>
           </div>
         ))}

@@ -5,45 +5,84 @@ import { useEffect, useState } from 'react';
 export default function DashboardPage() {
   const [profile, setProfile] = useState<any>(null);
   const [ledger, setLedger] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [amount, setAmount] = useState<number>(100);
+
+  const loadData = async () => {
+    const raw = localStorage.getItem('primebet-user');
+    const user = raw ? JSON.parse(raw) : { id: 'user-1' };
+
+    const profileRes = await fetch(`http://localhost:3001/api/auth/profile?userId=${user.id}`);
+    const profileData = await profileRes.json();
+    if (profileData.ok) {
+      setProfile(profileData.user);
+      const session = { ...user, ...profileData.user };
+      localStorage.setItem('primebet-user', JSON.stringify(session));
+    }
+
+    const ledgerRes = await fetch(`http://localhost:3001/api/wallet/ledger?userId=${user.id}`);
+    const ledgerData = await ledgerRes.json();
+    setLedger(ledgerData);
+    setLoading(false);
+  };
 
   useEffect(() => {
-    fetch('http://localhost:3001/api/auth/profile?userId=user-1')
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.ok) setProfile(data.user);
-      });
-
-    fetch('http://localhost:3001/api/wallet/ledger?userId=user-1')
-      .then((res) => res.json())
-      .then(setLedger)
-      .catch(console.error);
+    loadData();
   }, []);
 
+  const updateBalance = async (type: 'deposit' | 'withdraw') => {
+    const raw = localStorage.getItem('primebet-user');
+    const user = raw ? JSON.parse(raw) : { id: 'user-1' };
+
+    const res = await fetch(`http://localhost:3001/api/wallet/${type}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: user.id, amount }),
+    });
+
+    const data = await res.json();
+    if (data.ok) {
+      setProfile((prev: any) => ({ ...prev, balance: data.balance }));
+      const session = JSON.parse(localStorage.getItem('primebet-user') || '{}');
+      session.balance = data.balance;
+      localStorage.setItem('primebet-user', JSON.stringify(session));
+      setLedger(data.ledger || ledger);
+    } else {
+      alert(data.message);
+    }
+  };
+
+  if (loading) return <main className="page-shell"><div className="card-panel">Loading dashboard...</div></main>;
+
   return (
-    <main style={{ padding: 32, background: '#0b1020', color: '#f8fafc', minHeight: '100vh' }}>
-      <h1 style={{ fontSize: 42, marginBottom: 20 }}>Player Dashboard</h1>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 20 }}>
-        <div style={{ background: '#111827', borderRadius: 16, padding: 20 }}>
-          <div style={{ color: '#94a3b8' }}>Username</div>
-          <div style={{ fontSize: 24, marginTop: 8 }}>{profile?.username || 'Loading...'}</div>
-        </div>
-        <div style={{ background: '#111827', borderRadius: 16, padding: 20 }}>
-          <div style={{ color: '#94a3b8' }}>Balance</div>
-          <div style={{ fontSize: 24, marginTop: 8 }}>${profile?.balance || 0}</div>
-        </div>
-        <div style={{ background: '#111827', borderRadius: 16, padding: 20 }}>
-          <div style={{ color: '#94a3b8' }}>Role</div>
-          <div style={{ fontSize: 24, marginTop: 8 }}>{profile?.role || 'Loading...'}</div>
+    <main className="page-shell">
+      <div className="page-header-row">
+        <h1>Player Dashboard</h1>
+        <div className="pill-green">${profile?.balance ?? 0}</div>
+      </div>
+
+      <div className="stats-row compact">
+        <div className="mini-stat"><strong>{profile?.username}</strong><span>Username</span></div>
+        <div className="mini-stat"><strong>{profile?.role}</strong><span>Role</span></div>
+        <div className="mini-stat"><strong>{ledger.length}</strong><span>Transactions</span></div>
+      </div>
+
+      <div className="card-panel wallet-panel">
+        <h3>Wallet actions</h3>
+        <div className="wallet-actions">
+          <input type="number" min={10} step={10} value={amount} onChange={(e) => setAmount(Number(e.target.value))} />
+          <button className="primary-btn" onClick={() => updateBalance('deposit')}>Deposit</button>
+          <button className="secondary-btn" onClick={() => updateBalance('withdraw')}>Withdraw</button>
         </div>
       </div>
 
-      <section style={{ marginTop: 30 }}>
-        <h2>Wallet Ledger</h2>
-        <div style={{ background: '#111827', padding: 16, borderRadius: 16 }}>
+      <section className="card-panel ledger-panel">
+        <h3>Recent activity</h3>
+        <div className="ledger-list">
           {ledger.map((entry) => (
-            <div key={entry.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 0', borderBottom: '1px solid #1f2937' }}>
+            <div key={entry.id} className="ledger-row">
               <span>{entry.description}</span>
-              <span>{entry.type} ${entry.amount}</span>
+              <strong>{entry.type} ${entry.amount}</strong>
             </div>
           ))}
         </div>

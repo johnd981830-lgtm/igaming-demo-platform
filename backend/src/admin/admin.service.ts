@@ -8,6 +8,7 @@ export class AdminService {
     const totalBalance = users.reduce((sum, user) => sum + user.balance, 0);
     const activeBets = bets.filter((bet) => bet.status === 'open').length;
     const totalTurnover = ledger.reduce((sum, entry) => sum + entry.amount, 0);
+    const totalWinnings = ledger.filter((entry) => entry.type === 'win').reduce((sum, entry) => sum + entry.amount, 0);
 
     return {
       totalPlayers,
@@ -15,7 +16,15 @@ export class AdminService {
       activeBets,
       totalTurnover,
       totalGames: games.length,
-      recentActivity: bets.slice(-5).reverse(),
+      totalWinnings,
+      recentActivity: bets.slice(-5).reverse().map((bet) => ({
+        id: bet.id,
+        matchId: bet.matchId,
+        selection: bet.selection,
+        stake: bet.stake,
+        status: bet.status,
+        createdAt: bet.createdAt,
+      })),
     };
   }
 }

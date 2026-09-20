@@ -13,46 +13,82 @@ type Match = {
 
 export default function SportsPage() {
   const [matches, setMatches] = useState<Match[]>([]);
+  const [selectedStake, setSelectedStake] = useState<Record<string, number>>({});
   const [userId, setUserId] = useState('user-1');
+  const [balance, setBalance] = useState<number>(2500);
 
   useEffect(() => {
     fetch('http://localhost:3001/api/sportsbook/matches')
       .then((res) => res.json())
       .then(setMatches)
       .catch(console.error);
+
+    const raw = localStorage.getItem('primebet-user');
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      setUserId(parsed.id || 'user-1');
+      setBalance(parsed.balance || 2500);
+    }
   }, []);
 
-  const placeBet = async (matchId: string, selection: string, stake: number) => {
+  const placeBet = async (matchId: string, selection: string) => {
+    const stake = selectedStake[matchId] || 25;
     const res = await fetch('http://localhost:3001/api/sportsbook/bet', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId, matchId, selection, stake }),
     });
     const data = await res.json();
-    alert(data.ok ? `Bet placed: ${selection} @ ${data.bet.odds}` : data.message);
+    if (data.ok) {
+      setBalance(data.balance);
+      const saved = JSON.parse(localStorage.getItem('primebet-user') || '{}');
+      if (saved.id) {
+        saved.balance = data.balance;
+        localStorage.setItem('primebet-user', JSON.stringify(saved));
+      }
+      alert(`Bet placed on ${selection} for $${stake}`);
+    } else {
+      alert(data.message);
+    }
   };
 
   return (
-    <main style={{ padding: 32, background: '#0b1020', color: '#f8fafc', minHeight: '100vh' }}>
-      <h1 style={{ fontSize: 42, marginBottom: 20 }}>Sportsbook</h1>
-      <div style={{ display: 'grid', gap: 20 }}>
+    <main className="page-shell">
+      <div className="page-header-row">
+        <h1>Sportsbook</h1>
+        <div className="pill-green">Balance: ${balance}</div>
+      </div>
+
+      <div className="stack-list">
         {matches.map((match) => (
-          <div key={match.id} style={{ background: '#111827', borderRadius: 18, padding: 20 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div key={match.id} className="card-panel">
+            <div className="match-row">
               <div>
-                <div style={{ color: '#7dd3fc', fontWeight: 700 }}>{match.league}</div>
-                <h3 style={{ margin: '8px 0' }}>{match.home} vs {match.away}</h3>
+                <div className="muted-label">{match.league}</div>
+                <h3>{match.home} vs {match.away}</h3>
               </div>
-              <div>{new Date(match.startAt).toLocaleString()}</div>
+              <div className="muted-label">{new Date(match.startAt).toLocaleString()}</div>
             </div>
-            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginTop: 16 }}>
+
+            <div className="inline-controls">
+              <input
+                type="number"
+                min={5}
+                step={5}
+                value={selectedStake[match.id] || 25}
+                onChange={(e) => setSelectedStake((prev) => ({ ...prev, [match.id]: Number(e.target.value) }))}
+              />
+            </div>
+
+            <div className="odds-row">
               {match.markets.map((market) => (
                 <button
                   key={market.label}
-                  style={{ background: '#1e293b', color: '#f8fafc', padding: '10px 16px', border: 'none', borderRadius: 12, cursor: 'pointer' }}
-                  onClick={() => placeBet(match.id, market.label, 25)}
+                  className="bet-btn"
+                  onClick={() => placeBet(match.id, market.label)}
                 >
-                  {market.label} ({market.odds})
+                  {market.label}
+                  <span>{market.odds}</span>
                 </button>
               ))}
             </div>

@@ -13,23 +13,30 @@ export default function AdminPage() {
   }, []);
 
   return (
-    <main style={{ padding: 32, background: '#0b1020', color: '#f8fafc', minHeight: '100vh' }}>
-      <h1 style={{ fontSize: 42, marginBottom: 20 }}>Admin Dashboard</h1>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 20 }}>
-        <StatCard label="Players" value={stats?.totalPlayers ?? 0} />
-        <StatCard label="Total Balance" value={`$${stats?.totalBalance ?? 0}`} />
-        <StatCard label="Active Bets" value={stats?.activeBets ?? 0} />
-        <StatCard label="Games" value={stats?.totalGames ?? 0} />
+    <main className="page-shell">
+      <div className="page-header-row">
+        <h1>Admin Dashboard</h1>
+        <div className="pill-green">Operations live</div>
+      </div>
+
+      <div className="stats-row admin-grid">
+        <div className="mini-stat"><strong>{stats?.totalPlayers ?? 0}</strong><span>Players</span></div>
+        <div className="mini-stat"><strong>${stats?.totalBalance ?? 0}</strong><span>Wallet value</span></div>
+        <div className="mini-stat"><strong>{stats?.activeBets ?? 0}</strong><span>Open bets</span></div>
+        <div className="mini-stat"><strong>{stats?.totalGames ?? 0}</strong><span>Games</span></div>
+      </div>
+
+      <div className="card-panel">
+        <h3>Recent bet activity</h3>
+        <div className="ledger-list">
+          {(stats?.recentActivity ?? []).map((entry: any) => (
+            <div key={entry.id} className="ledger-row">
+              <span>{entry.selection}</span>
+              <strong>{entry.status} ${entry.stake}</strong>
+            </div>
+          ))}
+        </div>
       </div>
     </main>
-  );
-}
-
-function StatCard({ label, value }: { label: string; value: string | number }) {
-  return (
-    <div style={{ background: '#111827', padding: 20, borderRadius: 16 }}>
-      <div style={{ color: '#94a3b8' }}>{label}</div>
-      <div style={{ fontSize: 32, marginTop: 10, fontWeight: 700 }}>{value}</div>
-    </div>
   );
 }
