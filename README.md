@@ -7,71 +7,60 @@ A working demo MVP for a casino + sportsbook platform built with:
 - PostgreSQL-ready structure
 - Demo wallet, auth, sportsbook, casino, and admin APIs
 
-This is a demo/prototype for learning and product validation. It is not a licensed real-money gambling product.
+This project is a prototype for learning and product validation. It is not a licensed real-money gambling product.
 
 ## Stack
 
 - Frontend: Next.js + React + TypeScript + Tailwind CSS
 - Backend: NestJS + TypeScript
-- Data layer: in-memory mock store for rapid MVP demo
-- Runtime: Docker Compose
+- Data layer: mock in-memory store for rapid MVP testing
+- Runtime: Docker Compose for local services
 
-## Quick start
+## Local setup
 
-### 1) Start backend
+1. Install dependencies:
 
 ```bash
-cd backend
 npm install
-npm run start:dev
+npm run install:all
 ```
 
-API will run on `http://localhost:3001`
-
-### 2) Start frontend
+2. Start services:
 
 ```bash
-cd frontend
-npm install
 npm run dev
 ```
 
-Frontend will run on `http://localhost:3000`
+3. Open the app:
 
-### 3) Open the app
+- Frontend: http://localhost:3000
+- Backend: http://localhost:3001/api
 
-- Home: http://localhost:3000
-- Login: http://localhost:3000/login
-- Dashboard: http://localhost:3000/dashboard
-- Sports: http://localhost:3000/sports
-- Casino: http://localhost:3000/casino
-- Admin: http://localhost:3000/admin
-
-## Demo credentials
+## Demo accounts
 
 - User: `user@demo.com` / `demo123`
 - Admin: `admin@demo.com` / `admin123`
 
 ## Included features
 
-- Authentication
-- User wallet and ledger
-- Sportsbook match list and bet placement
-- Casino game lobby and gameplay simulation
-- Admin dashboard stats
-- CORS-ready API
+- Email/password authentication flow
+- User wallet and ledger system
+- Sportsbook matches and bet placement
+- Casino lobby and gameplay simulation
+- Admin summary dashboard
+- Dockerized local infrastructure
 
-## Notes
+## Production note
 
-For a production gambling platform, you will need:
+Real gambling products require:
 
 - licensing and compliance
-- KYC/AML workflows
-- geolocation and age verification
+- age verification and geolocation
+- KYC / AML
 - secure payment providers
-- sportsbook/casino provider APIs
-- real database and caching layer
-- monitoring and fraud controls
+- liability / fraud controls
+- game provider contracts
+- real database + cache + audit trails
 
 ## Repository
 
