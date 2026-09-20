@@ -5,10 +5,10 @@ import { WalletModule } from './wallet/wallet.module';
 import { SportsbookModule } from './sportsbook/sportsbook.module';
 import { CasinoModule } from './casino/casino.module';
 import { AdminModule } from './admin/admin.module';
+import { PrismaModule } from './prisma.module';
 
 @Module({
-  imports: [AuthModule, WalletModule, SportsbookModule, CasinoModule, AdminModule],
+  imports: [PrismaModule, AuthModule, WalletModule, SportsbookModule, CasinoModule, AdminModule],
   controllers: [AppController],
-  providers: [],
 })
 export class AppModule {}

@@ -1,55 +1,21 @@
 import { Injectable } from '@nestjs/common';
 import { v4 as uuid } from 'uuid';
-import { users } from '../mock-data';
+import { PrismaService } from '../prisma.service';
 
 @Injectable()
 export class AuthService {
-  private buildUserPayload(user: typeof users[number]) {
-    return {
-      id: user.id,
-      email: user.email,
-      username: user.username,
-      role: user.role,
-      balance: user.balance,
-    };
+  constructor(private readonly prisma: PrismaService) {}
+
+  private payload(user: any) { return { id: user.id, email: user.email, username: user.username, role: user.role.toLowerCase(), balance: Number(user.balance) }; }
+
+  async login(email: string, password: string) {
+    const user = await this.prisma.user.findUnique({ where: { email: email?.trim().toLowerCase() } });
+    if (!user || user.password !== password?.trim()) return { ok: false, message: 'Invalid email or password.' };
+    return { ok: true, token: `demo-token-${uuid()}`, user: this.payload(user) };
   }
 
-  login(email: string, password: string) {
-    const safeEmail = email?.trim().toLowerCase();
-    const safePassword = password?.trim();
-
-    if (!safeEmail || !safePassword) {
-      return { ok: false, message: 'Email and password are required.' };
-    }
-
-    const user = users.find((u) => u.email.toLowerCase() === safeEmail && u.password === safePassword);
-
-    if (!user) {
-      return { ok: false, message: 'Invalid email or password.' };
-    }
-
-    return {
-      ok: true,
-      token: `demo-token-${uuid()}`,
-      user: this.buildUserPayload(user),
-    };
-  }
-
-  getProfile(userId: string) {
-    const safeUserId = userId?.trim();
-
-    if (!safeUserId) {
-      return { ok: false, message: 'User id is required.' };
-    }
-
-    const user = users.find((u) => u.id === safeUserId);
-    if (!user) {
-      return { ok: false, message: 'User not found.' };
-    }
-
-    return {
-      ok: true,
-      user: this.buildUserPayload(user),
-    };
+  async getProfile(userId: string) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId?.trim() } });
+    return user ? { ok: true, user: this.payload(user) } : { ok: false, message: 'User not found.' };
   }
 }
