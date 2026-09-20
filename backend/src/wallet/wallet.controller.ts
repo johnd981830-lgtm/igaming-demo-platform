@@ -1,5 +1,6 @@
 import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { WalletService } from './wallet.service';
+import { WalletActionDto } from './dto/wallet-action.dto';
 
 @Controller('wallet')
 export class WalletController {
@@ -11,12 +12,12 @@ export class WalletController {
   }
 
   @Post('deposit')
-  deposit(@Body() body: { userId: string; amount: number }) {
-    return this.walletService.deposit(body.userId, Number(body.amount));
+  deposit(@Body() dto: WalletActionDto) {
+    return this.walletService.deposit(dto.userId, Number(dto.amount));
   }
 
   @Post('withdraw')
-  withdraw(@Body() body: { userId: string; amount: number }) {
-    return this.walletService.withdraw(body.userId, Number(body.amount));
+  withdraw(@Body() dto: WalletActionDto) {
+    return this.walletService.withdraw(dto.userId, Number(dto.amount));
   }
 }

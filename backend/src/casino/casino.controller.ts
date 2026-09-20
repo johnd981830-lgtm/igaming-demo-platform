@@ -1,5 +1,6 @@
 import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { CasinoService } from './casino.service';
+import { PlayGameDto } from './dto/play-game.dto';
 
 @Controller('casino')
 export class CasinoController {
@@ -16,7 +17,7 @@ export class CasinoController {
   }
 
   @Post('play')
-  playGame(@Body() body: { userId: string; gameId: string; wager: number }) {
-    return this.casinoService.playGame(body.userId, body.gameId, Number(body.wager));
+  playGame(@Body() dto: PlayGameDto) {
+    return this.casinoService.playGame(dto.userId, dto.gameId, Number(dto.wager));
   }
 }

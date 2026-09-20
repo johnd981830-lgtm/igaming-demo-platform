@@ -1,5 +1,6 @@
 import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { SportsbookService } from './sportsbook.service';
+import { PlaceBetDto } from './dto/place-bet.dto';
 
 @Controller('sportsbook')
 export class SportsbookController {
@@ -16,7 +17,7 @@ export class SportsbookController {
   }
 
   @Post('bet')
-  placeBet(@Body() body: { userId: string; matchId: string; selection: string; stake: number }) {
-    return this.sportsbookService.placeBet(body.userId, body.matchId, body.selection, Number(body.stake));
+  placeBet(@Body() dto: PlaceBetDto) {
+    return this.sportsbookService.placeBet(dto.userId, dto.matchId, dto.selection, Number(dto.stake));
   }
 }
