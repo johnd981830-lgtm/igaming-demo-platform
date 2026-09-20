@@ -1,14 +1,18 @@
 import './globals.css';
+import TopNav from '../components/TopNav';
 
 export const metadata = {
-  title: 'iGaming Demo',
-  description: 'Casino + sportsbook demo platform',
+  title: 'PrimeBet | iGaming Demo',
+  description: 'Casino and sportsbook demo MVP',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <TopNav />
+        {children}
+      </body>
     </html>
   );
 }
